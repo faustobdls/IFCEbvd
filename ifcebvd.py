@@ -5,8 +5,7 @@
 # /_/_/  BIBLIOTECA VIRTUAL DOWNLOADER
 
 from selenium import webdriver
-import urllib, hashlib, sys, platform, argparse
-import misc
+import urllib, hashlib, sys, platform, random
 
 def _baixa(_url,_nome):
   try:
@@ -17,21 +16,23 @@ def _baixa(_url,_nome):
     print('%s baixado' % _nome)
 
 _hash = lambda _mat: 'login=%s&token=%s' % (_mat, hashlib.md5(('%sQJEkJM2iLJiAj6LScxsZivml54SmzSy0' % _mat).encode()).hexdigest())
+# Matricula: Ano|Semestre|Curso|Numero crescente
+_matricula = lambda: '%s%s%05d%04d'%\
+                     (random.randrange(2012, 2016), random.randrange(1, 3), random.choice(['01106', '01101', '1222']), random.randrange(100, 270))
 
-def _dump(matricula, id_livro):
+def _dump(id_livro):
   b=webdriver.PhantomJS()
-  print('gerando cookie de login para matricura %s...' % matricula)
-  b.get('http://ifce.bv3.digitalpages.com.br/user_session/authentication_gateway?%s' % _hash(matricula))
-  print('inicializando...')
-  b.get('http://ifce.bv3.digitalpages.com.br/users/publications/%s' % id_livro)
+  print('gerando cookie de login para nova matricura aleatoria...')
+  b.get('http://ifce.bv3.digitalpages.com.br/user_session/authentication_gateway?%s' % _hash(_matricula))
   print('obtendo informacoes para o livro %s...' % id_livro)
+  b.get('http://ifce.bv3.digitalpages.com.br/users/publications/%s' % id_livro)
   p_1 = 0
   while(p_1 == 0):
     try:
       p_1 = b.execute_script("if ($('.backgroundImg')[0]) { return 1 } else { return 0 }")
     except:
       p_1 = 0
-  num_pag = 7 #int(b.execute_script("return RDP.options.pageSetLength")) - 2
+  num_pag = 5 #int(b.execute_script("return RDP.options.pageSetLength")) - 2
   print('preparando para baixar livro id=%s com %d paginas...' % (id_livro, num_pag))
   _baixa(b.execute_script("return $('.backgroundImg')[0].src"), "%s-00000.jpg" % id_livro)
   print('baixando livro...')
@@ -69,9 +70,9 @@ def _dump(matricula, id_livro):
 def _gerapdf(_livro):
   # usando a ferramenta convert do ImageMagick
   print('convertendo para PDF...')
+  import os
   soCorrente = platform.system()
   if (soCorrente == 'Linux'):
-    import os
     os.system('convert *.jpg %s.pdf' % _livro)
     print('limpando os jpgs residuais...')
     os.system('rm *.jpg')
@@ -90,26 +91,18 @@ def _gerapdf(_livro):
       pdf.image(str(page), 0, 0)
 
     pdf.output("%s.pdf" % _livro, "F")
+
+    del cover
+    for page in listPages:
+      os.remove(page)
   else:
     print('nao e possivel gerar pdf nesse sistema')
 
 if __name__ == "__main__":
-  parser = argparse.ArgumentParser()
-  parser.add_argument('--matricula', '-m',
-            help='Matricula para acessar o BVU (apenas numeros).'
-                 'Caso nao seja fornecida, sera gerada uma matricula aleatoria')
-  parser.add_argument('--livro', '-l', required=True,
-            help='ID do livro que será baixado.'
-                 'Para descobrir qual o ID do livro que deseja baixar, acesse-o no navegador'
-                 'e veja na barra de endereco os numeros apos o \'publications\'')
-  args = parser.parse_args()
+  listaLivros = sys.argv
+  del listaLivros[0]
 
-  if (args.matricula):
-    matricula = args.matricula
-  else:
-    matricula = misc.gerarMatricula()
-    print('nao foi fornecida uma matricula, entao sera usada a %s, gerada aleatorialmente' % matricula)
-
-  _dump(matricula, args.livro)
-  _gerapdf(args.livro)
+  for livroAtual in listaLivros:
+    _dump(livroAtual)
+    _gerapdf(livroAtual)
   print('operacao finalizada.')
