@@ -103,7 +103,7 @@ if __name__ == "__main__":
   del listaLivros[0]
 
   if (len(listaLivros) == 0):
-    print("Erro! Falta fornecer os livros a serem baixados!\n"
+    print("Erro! Falta fornecer o(s) livro(s) para baixar!\n"
           "Sintaxe: ifcevd.py <endereco url do livro no bvu> [endereco url de outro livro] ..")
     exit()
 
