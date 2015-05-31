@@ -1,23 +1,22 @@
 # IFCEbvd
-### IFCE Biblioteca Virtual Downloader
+## IFCE Biblioteca Virtual Downloader
 
-Ferramenta de download de livros da biblioteca virtual do IFCE. Baixa página a página como imagem e depois converte para pdf. **É necessário uma matricula válida do IFCE.** 
+Ferramenta de download de livros da biblioteca virtual do IFCE. Baixa página a página como imagem e depois converte para pdf.
 
-### Dependências
-Caso o browser a ser interagido seja o phantomJS
+## Dependências
+### Linux
+- Python3: sudo apt-get install python3
+- Biblioteca do Python Selenium: sudo apt-get install python3-selenium
+- PhantonJS: sudo apt-get install phantomjs
+- Imagemagick: sudo apt-get install imagemagick
 
-**$ sudo apt-get install phantomjs**
+### Windows
+- Python3: https://www.python.org/downloads/
+- Biblioteca do Python Selenium: pip install selenium
+- Biblioteca do Python fpdf: pip install fpdf
+- Biblioteca do Python pil: pip install pillow
+- PhantomJS: http://phantomjs.org/ (deixe o binário na mesma pasta do script)
 
-Senão, mudar a linha **21** para:
-
-**b=webdriver.Firefox()**
-
-Biblioteca Selenium, para automatizar a interação com a página web.
-
-**$ pip install -U selenium**
-
-Para juntar as imagens e montar o PDF, escolha o pacote de seu agrado. No linux, minha escolha foi o *convert* do pacote Imagemagick. Para instalá-lo:
-
-**$ sudo apt-get install imagemagick**
-
-Outras opções podem ser utilizada, apenas mudando o comando de saida na linha **71** do script.
+## Uso
+1. Abra o termina/cmd na pasta em que se localiza o script
+2. No Windows, use o comando `ifcevd.py <endereco url do livro no bvu> [endereco url de outro livro] ..`, no Linux, use `py3 ifcevd.py <endereco url do livro no bvu> [endereco url de outro livro] ..`. O endereço a ser fornecido é o mesmo do navegador. Pode-se fornecer quantos livros quiser.
