@@ -5,7 +5,8 @@
 # /_/_/  BIBLIOTECA VIRTUAL DOWNLOADER
 
 from selenium import webdriver
-import urllib, hashlib, sys, platform
+import urllib, hashlib, sys, platform, argparse
+import misc
 
 def _baixa(_url,_nome):
   try:
@@ -71,7 +72,7 @@ def _gerapdf(_livro):
   soCorrente = platform.system()
   if (soCorrente == 'Linux'):
     import os
-    os.system('convert *.jpg %s.pdf' % livro)
+    os.system('convert *.jpg %s.pdf' % _livro)
     print('limpando os jpgs residuais...')
     os.system('rm *.jpg')
   elif (soCorrente == 'Windows'):
@@ -88,18 +89,27 @@ def _gerapdf(_livro):
       pdf.add_page()
       pdf.image(str(page), 0, 0)
 
-    pdf.output("%s.pdf" % livro, "F")
+    pdf.output("%s.pdf" % _livro, "F")
   else:
     print('nao e possivel gerar pdf nesse sistema')
 
 if __name__ == "__main__":
-  if len(sys.argv) != 3:
-    print("ifcebvd.py -- IFCE Biblioteca Virtual Downloader  ")
-    print("sintaxe: ./ifcebvd.py [matricula] [id do livro]   ")
-    sys.exit(1)
+  parser = argparse.ArgumentParser()
+  parser.add_argument('--matricula', '-m',
+            help='Matricula para acessar o BVU (apenas numeros).'
+                 'Caso nao seja fornecida, sera gerada uma matricula aleatoria')
+  parser.add_argument('--livro', '-l', required=True,
+            help='ID do livro que será baixado.'
+                 'Para descobrir qual o ID do livro que deseja baixar, acesse-o no navegador'
+                 'e veja na barra de endereco os numeros apos o \'publications\'')
+  args = parser.parse_args()
+
+  if (args.matricula):
+    matricula = args.matricula
   else:
-    matricula = sys.argv[1]
-    livro = sys.argv[2]
-    _dump(matricula, livro)
-    _gerapdf(livro)
-    print('operacao finalizada.')
+    matricula = misc.gerarMatricula()
+    print('nao foi fornecida uma matricula, entao sera usada a %s, gerada aleatorialmente' % matricula)
+
+  _dump(matricula, args.livro)
+  _gerapdf(args.livro)
+  print('operacao finalizada.')
