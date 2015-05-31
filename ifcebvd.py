@@ -32,7 +32,7 @@ def _dump(id_livro):
       p_1 = b.execute_script("if ($('.backgroundImg')[0]) { return 1 } else { return 0 }")
     except:
       p_1 = 0
-  num_pag = 5 #int(b.execute_script("return RDP.options.pageSetLength")) - 2
+  num_pag = int(b.execute_script("return RDP.options.pageSetLength")) - 2
   print('preparando para baixar livro id=%s com %d paginas...' % (id_livro, num_pag))
   _baixa(b.execute_script("return $('.backgroundImg')[0].src"), "%s-00000.jpg" % id_livro)
   print('baixando livro...')
@@ -101,6 +101,12 @@ def _gerapdf(_livro):
 if __name__ == "__main__":
   listaLivros = sys.argv
   del listaLivros[0]
+
+  if (len(listaLivros) == 0):
+    print("Erro! Falta fornecer os livros a serem baixados!\n"
+          "Sintaxe: ifcevd.py <endereco url do livro no bvu> [endereco url de outro livro] ..")
+    exit()
+
   listaLivros = map(lambda i: i if (i.isdigit()) else re.match(r"(?:.*publications\/(\d+)|(\d+))", i).group(1), listaLivros)
 
   for livroAtual in listaLivros:
