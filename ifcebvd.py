@@ -5,7 +5,7 @@
 # /_/_/  BIBLIOTECA VIRTUAL DOWNLOADER
 
 from selenium import webdriver
-import urllib, hashlib, sys, platform, random
+import urllib, hashlib, sys, platform, random, re
 
 def _baixa(_url,_nome):
   try:
@@ -101,6 +101,7 @@ def _gerapdf(_livro):
 if __name__ == "__main__":
   listaLivros = sys.argv
   del listaLivros[0]
+  listaLivros = map(lambda i: i if (i.isdigit()) else re.match(r"(?:.*publications\/(\d+)|(\d+))", i).group(1), listaLivros)
 
   for livroAtual in listaLivros:
     _dump(livroAtual)
