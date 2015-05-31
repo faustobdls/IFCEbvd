@@ -5,7 +5,7 @@
 # /_/_/  BIBLIOTECA VIRTUAL DOWNLOADER
 
 from selenium import webdriver
-import urllib, hashlib, os, sys
+import urllib, hashlib, sys, platform
 
 def _baixa(_url,_nome):
   try:
@@ -30,7 +30,7 @@ def _dump(matricula, id_livro):
       p_1 = b.execute_script("if ($('.backgroundImg')[0]) { return 1 } else { return 0 }")
     except:
       p_1 = 0
-  num_pag = int(b.execute_script("return RDP.options.pageSetLength")) - 2
+  num_pag = 7 #int(b.execute_script("return RDP.options.pageSetLength")) - 2
   print('preparando para baixar livro id=%s com %d paginas...' % (id_livro, num_pag))
   _baixa(b.execute_script("return $('.backgroundImg')[0].src"), "%s-00000.jpg" % id_livro)
   print('baixando livro...')
@@ -68,9 +68,29 @@ def _dump(matricula, id_livro):
 def _gerapdf(_livro):
   # usando a ferramenta convert do ImageMagick
   print('convertendo para PDF...')
-  os.system('convert *.jpg %s.pdf' % livro)
-  print('limpando os jpgs residuais...')
-  os.system('rm *.jpg')
+  soCorrente = platform.system()
+  if (soCorrente == 'Linux'):
+    import os
+    os.system('convert *.jpg %s.pdf' % livro)
+    print('limpando os jpgs residuais...')
+    os.system('rm *.jpg')
+  elif (soCorrente == 'Windows'):
+    from fpdf import FPDF
+    from PIL import Image
+    import glob
+    listPages = glob.glob('*.jpg')
+    cover = Image.open(str(listPages[0]))
+    width, height = cover.size
+
+    pdf = FPDF(unit = "pt", format = [width, height])
+
+    for page in listPages:
+      pdf.add_page()
+      pdf.image(str(page), 0, 0)
+
+    pdf.output("%s.pdf" % livro, "F")
+  else:
+    print('nao e possivel gerar pdf nesse sistema')
 
 if __name__ == "__main__":
   if len(sys.argv) != 3:
