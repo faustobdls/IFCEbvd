@@ -6,7 +6,7 @@ Ferramenta de download de livros da biblioteca virtual do IFCE. Baixa página a 
 ## Dependências
 ### Linux
 - Python3: sudo apt-get install python3
-- Biblioteca do Python Selenium: sudo apt-get install python3-selenium
+- Biblioteca do Python Selenium: sudo pip3 install selenium
 - PhantonJS: sudo apt-get install phantomjs
 - Imagemagick: sudo apt-get install imagemagick
 
