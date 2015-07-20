@@ -16,14 +16,11 @@ def _baixa(_url,_nome):
     print('%s baixado' % _nome)
 
 _hash = lambda _mat: 'login=%s&token=%s' % (_mat, hashlib.md5(('%sQJEkJM2iLJiAj6LScxsZivml54SmzSy0' % _mat).encode()).hexdigest())
-# Matricula: Ano|Semestre|Curso|Numero crescente
-_matricula = lambda: '%s%s%05d%04d'%\
-                     (random.randrange(2012, 2016), random.randrange(1, 3), random.choice(['01106', '01101', '1222']), random.randrange(100, 270))
 
-def _dump(id_livro):
+def _dump(matricula, id_livro):
   b=webdriver.PhantomJS()
-  print('gerando cookie de login para nova matricura aleatoria...')
-  b.get('http://ifce.bv3.digitalpages.com.br/user_session/authentication_gateway?%s' % _hash(_matricula))
+  print('gerando cookie de login para matricura %s...' % matricula)
+  b.get('http://ifce.bv3.digitalpages.com.br/user_session/authentication_gateway?%s' % _hash(matricula))
   print('obtendo informacoes para o livro %s...' % id_livro)
   b.get('http://ifce.bv3.digitalpages.com.br/users/publications/%s' % id_livro)
   p_1 = 0
@@ -32,7 +29,7 @@ def _dump(id_livro):
       p_1 = b.execute_script("if ($('.backgroundImg')[0]) { return 1 } else { return 0 }")
     except:
       p_1 = 0
-  num_pag = int(b.execute_script("return RDP.options.pageSetLength")) - 2
+  num_pag = 4 #int(b.execute_script("return RDP.options.pageSetLength")) - 2
   print('preparando para baixar livro id=%s com %d paginas...' % (id_livro, num_pag))
   _baixa(b.execute_script("return $('.backgroundImg')[0].src"), "%s-00000.jpg" % id_livro)
   print('baixando livro...')
@@ -99,17 +96,16 @@ def _gerapdf(_livro):
     print('nao e possivel gerar pdf nesse sistema')
 
 if __name__ == "__main__":
-  listaLivros = sys.argv
-  del listaLivros[0]
-
-  if (len(listaLivros) == 0):
-    print("Erro! Falta fornecer o(s) livro(s) para baixar!\n"
-          "Sintaxe: ifcevd.py <endereco url do livro no bvu> [endereco url de outro livro] ..")
+  if (len(sys.argv) < 1):
+    print("Falta fornecer parâmetros!\n"
+          "Sintaxe: ifcevd.py <número da matrícula> <endereco url do livro no bvu> [endereco url de outro livro] ..")
     exit()
+
+  _, matricula, *listaLivros = sys.argv
 
   listaLivros = map(lambda i: i if (i.isdigit()) else re.match(r"(?:.*publications\/(\d+)|(\d+))", i).group(1), listaLivros)
 
   for livroAtual in listaLivros:
-    _dump(livroAtual)
+    _dump(matricula, livroAtual)
     _gerapdf(livroAtual)
   print('operacao finalizada.')
