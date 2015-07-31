@@ -19,4 +19,4 @@ Ferramenta de download de livros da biblioteca virtual do IFCE. Baixa página a 
 
 ## Uso
 1. Abra o termina/cmd na pasta em que se localiza o script
-2. No Windows, use o comando `ifcevd.py <endereco url do livro no bvu> [endereco url de outro livro] ..`, no Linux, use `py3 ifcevd.py <endereco url do livro no bvu> [endereco url de outro livro] ..`. O endereço a ser fornecido é o mesmo do navegador. Pode-se fornecer quantos livros quiser.
+2. No Windows, use o comando `ifcevd.py <números, e somente os numeros, de sua matrícula> <endereco url do livro no bvu> [endereco url de outro livro] ..`, no Linux, use `py3 ifcevd.py <números, e somente os numeros, de sua matrícula> <endereco url do livro no bvu> [endereco url de outro livro] ..`. O endereço a ser fornecido é o mesmo do navegador. Pode-se fornecer quantos livros quiser.
