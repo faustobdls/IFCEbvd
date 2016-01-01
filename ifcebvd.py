@@ -9,11 +9,11 @@ from selenium.common.exceptions import TimeoutException
 import urllib
 import hashlib
 import sys
-import platform
 import re
+import os
 
 
-def _baixa(_url, _nome):
+def page_download(_url, _nome):
     try:
         urllib.request.urlretrieve(_url, _nome)
     except:
@@ -24,7 +24,7 @@ def _baixa(_url, _nome):
 _hash = lambda _mat: 'login=%s&token=%s' % (_mat, hashlib.md5(('%sQJEkJM2iLJiAj6LScxsZivml54SmzSy0' % _mat).encode()).hexdigest())
 
 
-def _dump(matricula, id_livro):
+def dump(matricula, id_book):
     phantom = webdriver.PhantomJS()
     phantom.set_page_load_timeout(10)
 
@@ -34,15 +34,15 @@ def _dump(matricula, id_livro):
         phantom.get('http://ifce.bv3.digitalpages.com.br/user_session/authentication_gateway?%s' % _hash(matricula))
     except TimeoutException:
         print('Timeout durante o login... Refazendo-o...')
-        return _dump(matricula, id_livro)
+        return dump(matricula, id_book)
 
     # Obter informações do livro
-    print('obtendo informacoes para o livro %s...' % id_livro)
+    print('obtendo informacoes para o livro %s...' % id_book)
     try:
-        phantom.get('http://ifce.bv3.digitalpages.com.br/users/publications/%s' % id_livro)
+        phantom.get('http://ifce.bv3.digitalpages.com.br/users/publications/%s' % id_book)
     except TimeoutException as e:
         print('Timeout durante a coleta das informações do livro... Recomeçando tudo...')
-        return _dump(matricula, id_livro)
+        return dump(matricula, id_book)
     p_1 = 0
     while p_1 == 0:
         try:
@@ -52,8 +52,8 @@ def _dump(matricula, id_livro):
     num_pag = int(phantom.execute_script('return RDP.options.pageSetLength')) - 2
 
     # Download
-    print('preparando para baixar livro id=%s com %d paginas...' % (id_livro, num_pag))
-    _baixa(phantom.execute_script("return $('.backgroundImg')[0].src"), '%s-00000.jpg' % id_livro)
+    print('preparando para baixar livro id=%s com %d paginas...' % (id_book, num_pag))
+    page_download(phantom.execute_script("return $('.backgroundImg')[0].src"), '%s-00000.jpg' % id_book)
     print('baixando livro...')
     phantom.execute_script('navigate.next_page()')
     _v_p1, _v_p2 = '', ''
@@ -70,15 +70,15 @@ def _dump(matricula, id_livro):
         _p1 = phantom.execute_script("return $('.backgroundImg')[0].src")
         _p2 = phantom.execute_script("return $('.backgroundImg')[1].src")
         # checa se ainda não carregou a nova pagina
-        while((_p1 == _v_p1) or (_p2 == _v_p2)):
+        while (_p1 == _v_p1) or (_p2 == _v_p2):
             try:
                 _p1 = phantom.execute_script("return $('.backgroundImg')[0].src")
                 _p2 = phantom.execute_script("return $('.backgroundImg')[1].src")
             except:
                 pass
         # carregou nova, baixar...
-        _baixa(_p1, '%s-%05d.jpg' % (id_livro, i))
-        _baixa(_p2, '%s-%05d.jpg' % (id_livro, i+1))
+        page_download(_p1, '%s-%05d.jpg' % (id_book, i))
+        page_download(_p2, '%s-%05d.jpg' % (id_book, i+1))
         # ajusta os novos valores
         _v_p1, _v_p2 = _p1, _p2
         phantom.execute_script('navigate.next_page()')
@@ -89,32 +89,21 @@ def _dump(matricula, id_livro):
     phantom.quit()
 
 
-def _gerapdf(_livro):
+def make_pdf(_livro):
     print('convertendo para PDF...')
-    import os
-    so_corrente = platform.system()
-    if so_corrente == 'Linux':
-        # usando a ferramenta convert do ImageMagick
-        os.system('convert *.jpg %s.pdf' % _livro)
-        print('limpando os jpgs residuais...')
-        os.system('rm *.jpg')
-    elif so_corrente == 'Windows':
-        from fpdf import FPDF
-        from PIL import Image
-        import glob
-        list_pages = glob.glob('*.jpg')
-        cover = Image.open(str(list_pages[0]))
-        width, height = cover.size
-        pdf = FPDF(unit='pt', format=[width, height])
-        for page in list_pages:
-            pdf.add_page()
-            pdf.image(str(page), 0, 0)
-        pdf.output('%s.pdf' % _livro, 'F')
-        del cover
-        for page in list_pages:
-            os.remove(page)
-    else:
-        print('nao e possivel gerar pdf nesse sistema')
+    from fpdf import FPDF
+    from PIL import Image
+    import glob
+    list_pages = sorted(glob.glob('*.jpg'))
+    cover = Image.open(str(list_pages[0]))
+    width, height = cover.size
+    pdf = FPDF(unit='pt', format=[width, height])
+    for page in list_pages:
+        pdf.add_page()
+        pdf.image(str(page), 0, 0)
+    pdf.output('%s.pdf' % _livro, 'F')
+    for page in list_pages:
+        os.remove(page)
 
 
 if __name__ == "__main__":
@@ -123,11 +112,11 @@ if __name__ == "__main__":
               "Sintaxe: ifcevd.py <número da matrícula> <endereco url do livro no bvu> [endereco url de outro livro] ..")
         exit()
 
-    _, matricula, *lista_livros = sys.argv
+    _, matricula, *book_list = sys.argv
 
-    lista_livros = map(lambda i: i if (i.isdigit()) else re.match(r'(?:.*publications\/(\d+)|(\d+))', i).group(1), lista_livros)
+    book_list = map(lambda i: i if (i.isdigit()) else re.match(r'(?:.*publications\/(\d+)|(\d+))', i).group(1), book_list)
 
-    for livro_atual in lista_livros:
-        _dump(matricula, livro_atual)
-        _gerapdf(livro_atual)
+    for livro_atual in book_list:
+        #dump(matricula, livro_atual)
+        make_pdf(livro_atual)
     print('operacao finalizada.')
