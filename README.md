@@ -2,20 +2,13 @@
 ## IFCE Biblioteca Virtual Downloader
 
 Ferramenta de download de livros da biblioteca virtual do IFCE. Baixa página a página como imagem e depois converte para pdf.
+<a href="http://macalogs.com.br/estudo-de-caso-baixando-livros-de-uma-biblioteca-virtual/">Veja esse estudo de caso para saber como ela foi desenvolvida.</a>
 
 ## Dependências
-### Linux
-- Python3: sudo apt-get install python3
-- Biblioteca do Python Selenium: sudo pip3 install selenium
-- PhantonJS: sudo apt-get install phantomjs
-- Imagemagick: sudo apt-get install imagemagick
-
-### Windows
-- Python3: https://www.python.org/downloads/
-- Biblioteca do Python Selenium: pip install selenium
-- Biblioteca do Python fpdf: pip install fpdf
-- Biblioteca do Python pil: pip install pillow
-- PhantomJS: http://phantomjs.org/ (deixe o binário na mesma pasta do script)
+- Biblioteca do Python Selenium: `sudo pip3 install selenium`
+- Biblioteca do Python fpdf: `sudo pip3 install fpdf`
+- Biblioteca do Python Selenium: `sudo pip3 install selenium`
+- PhantonJS: `sudo apt-get install phantomjs`
 
 ## Uso
 1. Abra o termina/cmd na pasta em que se localiza o script
