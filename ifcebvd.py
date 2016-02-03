@@ -31,7 +31,7 @@ def dump(matricula, id_book):
     # Login
     print('gerando cookie de login para matricura %s...' % matricula)
     try:
-        phantom.get('http://ifce.bv3.digitalpages.com.br/user_session/authentication_gateway?%s' % _hash(matricula))
+        phantom.get('http://ifcefortaleza.bv3.digitalpages.com.br/user_session/authentication_gateway?%s' % _hash(matricula))
     except TimeoutException:
         print('Timeout durante o login... Refazendo-o...')
         return dump(matricula, id_book)
@@ -39,7 +39,7 @@ def dump(matricula, id_book):
     # Obter informações do livro
     print('obtendo informacoes para o livro %s...' % id_book)
     try:
-        phantom.get('http://ifce.bv3.digitalpages.com.br/users/publications/%s' % id_book)
+        phantom.get('http://ifcefortaleza.bv3.digitalpages.com.br/users/publications/%s' % id_book)
     except TimeoutException as e:
         print('Timeout durante a coleta das informações do livro... Recomeçando tudo...')
         return dump(matricula, id_book)
@@ -117,6 +117,6 @@ if __name__ == "__main__":
     book_list = map(lambda i: i if (i.isdigit()) else re.match(r'(?:.*publications\/(\d+)|(\d+))', i).group(1), book_list)
 
     for livro_atual in book_list:
-        #dump(matricula, livro_atual)
+        dump(matricula, livro_atual)
         make_pdf(livro_atual)
     print('operacao finalizada.')
