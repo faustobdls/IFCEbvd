@@ -7,7 +7,6 @@
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
 import urllib
-import hashlib
 import sys
 import re
 import os
@@ -21,17 +20,17 @@ def page_download(_url, _nome):
     else:
         print('%s baixado' % _nome)
 
-_hash = lambda _mat: 'login=%s&token=%s' % (_mat, hashlib.md5(('%sQJEkJM2iLJiAj6LScxsZivml54SmzSy0' % _mat).encode()).hexdigest())
-
 
 def dump(matricula, id_book):
     phantom = webdriver.PhantomJS()
     phantom.set_page_load_timeout(10)
 
     # Login
-    print('gerando cookie de login para matricura %s...' % matricula)
+    print('Logando no BVU com a matrícula %s...' % matricula)
     try:
-        phantom.get('http://ifcefortaleza.bv3.digitalpages.com.br/user_session/authentication_gateway?%s' % _hash(matricula))
+        phantom.get('http://bvu.ifce.edu.br/login.php')
+        phantom.find_element_by_id('Login').send_keys(matricula)
+        phantom.find_element_by_class_name('btn-large').click()
     except TimeoutException:
         print('Timeout durante o login... Refazendo-o...')
         return dump(matricula, id_book)
