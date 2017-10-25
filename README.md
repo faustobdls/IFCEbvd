@@ -11,5 +11,12 @@ Ferramenta de download de livros da biblioteca virtual do IFCE. Baixa página a 
 - PhantonJS: `sudo apt-get install phantomjs`
 
 ## Uso
-1. Abra o termina/cmd na pasta em que se localiza o script
-2. No Windows, use o comando `ifcevd.py <números, e somente os numeros, de sua matrícula> <endereco url do livro no bvu> [endereco url de outro livro] ..`, no Linux, use `py3 ifcevd.py <números, e somente os numeros, de sua matrícula> <endereco url do livro no bvu> [endereco url de outro livro] ..`. O endereço a ser fornecido é o mesmo do navegador. Pode-se fornecer quantos livros quiser.
+**Windows**
+1. Abra o CMD na pasta em que se localiza o script
+2. Use o comando: `ifcevd.py <números, e somente os numeros, de sua matrícula> <endereco url do livro no bvu> [endereco url de outro livro] ..`.
+
+**Linux**
+1. Abra o terminal na pasta em que se localiza o script
+2. Use o comando: `py3 ifcevd.py <números, e somente os numeros, de sua matrícula> <endereco url do livro no bvu> [endereco url de outro livro] ..`. 
+
+***OBS:** O endereço a ser fornecido é o mesmo do navegador. Pode-se fornecer quantos livros quiser.*
