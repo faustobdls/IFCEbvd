@@ -36,7 +36,7 @@ def dump(matricula, senha, id_book):
         phantom.find_element_by_id('user_submit_action').click()
     except TimeoutException:
         print('Timeout durante o login... Refazendo-o...')
-        return dump(matricula, id_book)
+        return dump(matricula, senha, id_book)
 
     # Obter informações do livro
     print('obtendo informacoes para o livro %s...' % id_book)
@@ -44,7 +44,7 @@ def dump(matricula, senha, id_book):
         phantom.get('http://ufersa.bv3.digitalpages.com.br/users/publications/%s' % id_book)
     except TimeoutException as e:
         print('Timeout durante a coleta das informações do livro... Recomeçando tudo...')
-        return dump(matricula, id_book)
+        return dump(matricula, senha, id_book)
     p_1 = 0
     while p_1 == 0:
         try:
@@ -114,11 +114,11 @@ if __name__ == "__main__":
               "Sintaxe: download.py <número da matrícula> <senha> <endereco url do livro no bvu> [endereco url de outro livro] ..")
         exit()
 
-    _, matricula, *book_list = sys.argv
+    _, matricula, senha, *book_list = sys.argv
 
     book_list = map(lambda i: i if (i.isdigit()) else re.match(r'(?:.*publications\/(\d+)|(\d+))', i).group(1), book_list)
 
     for livro_atual in book_list:
-        dump(matricula, livro_atual)
+        dump(matricula, senha, livro_atual)
         make_pdf(livro_atual)
     print('operacao finalizada.')
