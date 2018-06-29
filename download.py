@@ -4,6 +4,8 @@
 #  / / _/          Tecnologia do Ceará
 # /_/_/  BIBLIOTECA VIRTUAL DOWNLOADER
 
+# Modify by: Fausto Blanco | UFERSA
+
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
 import urllib
@@ -21,16 +23,17 @@ def page_download(_url, _nome):
         print('%s baixado' % _nome)
 
 
-def dump(matricula, id_book):
+def dump(matricula, senha, id_book):
     phantom = webdriver.PhantomJS()
     phantom.set_page_load_timeout(10)
 
     # Login
     print('Logando no BVU com a matrícula %s...' % matricula)
     try:
-        phantom.get('http://bvu.ifce.edu.br/login.php')
-        phantom.find_element_by_id('Login').send_keys(matricula)
-        phantom.find_element_by_class_name('btn-large').click()
+        phantom.get('https://ufersa.bv3.digitalpages.com.br/users/sign_in')
+        phantom.find_element_by_id('user_login').send_keys(matricula)
+        phantom.find_element_by_id('user_password').send_keys(senha)
+        phantom.find_element_by_id('user_submit_action').click()
     except TimeoutException:
         print('Timeout durante o login... Refazendo-o...')
         return dump(matricula, id_book)
@@ -38,7 +41,7 @@ def dump(matricula, id_book):
     # Obter informações do livro
     print('obtendo informacoes para o livro %s...' % id_book)
     try:
-        phantom.get('http://ifcefortaleza.bv3.digitalpages.com.br/users/publications/%s' % id_book)
+        phantom.get('http://ufersa.bv3.digitalpages.com.br/users/publications/%s' % id_book)
     except TimeoutException as e:
         print('Timeout durante a coleta das informações do livro... Recomeçando tudo...')
         return dump(matricula, id_book)
@@ -108,7 +111,7 @@ def make_pdf(_livro):
 if __name__ == "__main__":
     if len(sys.argv) == 1:
         print("Falta fornecer parâmetros!\n"
-              "Sintaxe: ifcevd.py <número da matrícula> <endereco url do livro no bvu> [endereco url de outro livro] ..")
+              "Sintaxe: download.py <número da matrícula> <senha> <endereco url do livro no bvu> [endereco url de outro livro] ..")
         exit()
 
     _, matricula, *book_list = sys.argv
